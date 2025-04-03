@@ -163,3 +163,51 @@ DROP COLUMN otros_datos;
 
 ALTER TABLE solicitud_credito DROP FOREIGN KEY fk_informacion_solicitante_credito_usuarios1;
 ALTER TABLE solicitud_credito DROP COLUMN usuarios_id_usuario;
+
+-- -----------------------------------------------------
+-- UPDATE TABLAS DE CLIENTES
+-- --------------------------------------------------------
+ALTER TABLE clientes
+DROP COLUMN primer_nombre,
+DROP COLUMN segundo_nombre, 
+DROP COLUMN primer_apellido,
+DROP COLUMN segundo_apellido,
+DROP COLUMN otros_apellidos,
+DROP COLUMN departamento, 
+DROP COLUMN municipio, 
+DROP COLUMN zona,
+DROP COLUMN grupo_habitacional,
+DROP COLUMN vialidad,
+DROP COLUMN numero_casa,
+DROP COLUMN prefijo,
+DROP COLUMN correo_electronico,
+DROP COLUMN telefono,
+DROP COLUMN fecha_nacimiento,
+ADD COLUMN id_cliente_individual INT NOT NULL,
+ADD COLUMN id_cliente_juridico INT NOT NULL,
+ADD COLUMN id_socio INT NOT NULL;
+
+ALTER TABLE clientes DROP FOREIGN KEY fk_clientes_manejo_chequera1;
+ALTER TABLE clientes DROP COLUMN manejo_chequera_id_chequera;
+
+ALTER TABLE clientes_individuales
+ADD COLUMN `departamento` VARCHAR(300) NOT NULL,
+ADD COLUMN `municipio` VARCHAR(300) NOT NULL,
+ADD COLUMN `zona` VARCHAR(300) NOT NULL,
+ADD COLUMN `grupo_habitacional` VARCHAR(300) NOT NULL,
+ADD COLUMN `vialidad` VARCHAR(300) NOT NULL,
+ADD COLUMN `numero_casa` VARCHAR(300) NOT NULL,
+ADD COLUMN telefono VARCHAR(20) NULL DEFAULT NULL,
+ADD COLUMN correo_electronico VARCHAR(100) NULL DEFAULT NULL,
+ADD COLUMN dpi VARCHAR(20) NOT NULL AFTER id_cliente_individual,
+CHANGE `estado` `estado_civil` ENUM ('CASADO', 'SOLTERO') NULL DEFAULT NULL;
+
+ ALTER TABLE clientesjuridicos
+ DROP COLUMN direccion_fiscal,
+ ADD COLUMN tipo_institucion VARCHAR(100) NULL DEFAULT NULL,
+ ADD COLUMN `departamento` VARCHAR(300) NOT NULL,
+ ADD COLUMN `municipio` VARCHAR(300) NOT NULL,
+ ADD COLUMN `zona` VARCHAR(300) NOT NULL,
+ ADD COLUMN `grupo_habitacional` VARCHAR(300) NULL DEFAULT NULL,
+ ADD COLUMN `vialidad` VARCHAR(300) NULL DEFAULT NULL,
+ ADD COLUMN `numero_casa` VARCHAR(300) NULL DEFAULT NULL;
