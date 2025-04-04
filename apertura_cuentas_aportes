@@ -1,0 +1,22 @@
+DELIMITER //
+CREATE PROCEDURE `apertura_cuentas_aportes`(IN p_monto_aportacion decimal(12, 2),IN p_fecha_creacion DATETIME , IN p_id_clientes INT)
+    BEGIN
+		DECLARE cuenta_existente INT;
+            SELECT COUNT(*) INTO cuenta_existente
+		    FROM cuentas_aportes
+            WHERE id_clientes = p_id_clientes;
+            
+		IF cuenta_existente > 0 THEN
+           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El cliente ya tiene una cuenta monetaria abierta';
+        END IF;
+        
+		IF p_monto_aportacion <= 0 THEN
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El monto inicial debe ser mayor que 0';
+		END IF;
+
+		INSERT INTO cuentas_aportes (monto_aportacion, fecha_creacion, id_clientes)
+		VALUES (p_monto_aportacion, now() , p_id_clientes);
+
+
+    END // 
+DELIMITER ;
