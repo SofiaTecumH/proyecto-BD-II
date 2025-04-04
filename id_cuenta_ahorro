@@ -1,0 +1,7 @@
+CREATE TRIGGER `cuentas_ahorro_BEFORE_INSERT` BEFORE INSERT ON `cuentas_ahorro` FOR EACH ROW BEGIN
+ SET NEW.id_cuenta_ahorro = CONCAT(
+       3, LPAD(FLOOR(RAND() * 10000), 3, '0'), '-', 
+        LPAD(FLOOR(RAND() * 100000), 5, '0'), '-', 
+        LPAD(FLOOR(RAND() * 10000), 4, '0')
+    );
+END
