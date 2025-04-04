@@ -1,0 +1,4 @@
+CREATE TRIGGER `cuentas_aportes_AFTER_INSERT` AFTER INSERT ON `cuentas_aportes` FOR EACH ROW BEGIN
+INSERT INTO cuentas_ahorro(saldo, tasa_interes, fecha_apertura,id_clientes)
+VALUES(new.monto_aportacion, NULL, CURRENT_TIMESTAMP,new.id_clientes);
+END
