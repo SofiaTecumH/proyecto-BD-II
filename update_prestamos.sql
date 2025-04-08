@@ -211,3 +211,74 @@ CHANGE `estado` `estado_civil` ENUM ('CASADO', 'SOLTERO') NULL DEFAULT NULL;
  ADD COLUMN `grupo_habitacional` VARCHAR(300) NULL DEFAULT NULL,
  ADD COLUMN `vialidad` VARCHAR(300) NULL DEFAULT NULL,
  ADD COLUMN `numero_casa` VARCHAR(300) NULL DEFAULT NULL;
+
+-- -------------------------------------------------------------
+-- UPDATE TABLA PRESTAMO UPDATE 07/04/2025
+-- -------------------------------------------------------------
+ALTER TABLE prestamos
+DROP COLUMN fecha_aprobacion,
+CHANGE `fecha_solicitud` `fecha` DATETIME,
+DROP COLUMN monto_solicitado,
+CHANGE `monto_aprobado` `monto` DECIMAL(12,2) DEFAULT '0.00',
+DROP COLUMN fecha_pago;
+-- EL PRESTAMO SE PAGA EL PRIMERO DE CADA MES
+
+CREATE TABLE usuarios_cuenta_juridica(
+id_usuario_cuenta_juridica INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+primer_nombre VARCHAR(100) NOT NULL,
+segundo_nombre VARCHAR(100) NULL DEFAULT NULL,
+otros_nombres VARCHAR(100) NULL DEFAULT NULL,
+primer_apellido VARCHAR(250) NOT NULL,
+segundo_apellido VARCHAR(250) NULL DEFAULT NULL,
+otros_apellidos VARCHAR(250) NULL DEFAULT NULL,
+puesto VARCHAR(100) NULL DEFAULT NULL,
+dpi_empleado VARCHAR(30) NOT NULL,
+mail_corporativo VARCHAR(100) NULL DEFAULT NULL
+);
+
+ALTER TABLE solicitud_credito
+DROP COLUMN primer_nombre,
+DROP COLUMN segundo_apellido,
+DROP COLUMN otros_nombres,
+DROP COLUMN primer_apellido,
+-- DROP COLUMN segundo_apellido,
+DROP COLUMN otros_apellidos,
+DROP COLUMN departamento,
+DROP COLUMN municipio,
+DROP COLUMN vialidad,
+DROP COLUMN telefono,
+DROP COLUMN zona,
+DROP COLUMN grupo_habitacional,
+DROP COLUMN numero_casa,
+ADD COLUMN cliente_id_cliente INT NULL DEFAULT NULL,
+ADD COLUMN fiador_id_fiador INT NULL DEFAULT NULL,
+ADD COLUMN estado_solicitud ENUM ('APROBADO', 'RECHAZADO'),
+ADD CONSTRAINT fk_id_cliente1 FOREIGN KEY (cliente_id_cliente) REFERENCES clientes(id_clientes),
+ADD CONSTRAINT fk_id_fiador FOREIGN KEY (fiador_id_fiador) REFERENCES fiador(id_fiador);
+
+CREATE TABLE fiador(
+id_fiador INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+cliente_id_cliente INT NULL DEFAULT NULL,
+parentesco VARCHAR(50) NOT NULL,
+prestamo_id_prestamo INT NOT NULL,
+fecha_registro DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (cliente_id_cliente) REFERENCES clientes(id_clientes)
+);
+
+ALTER TABLE solicitud_credito ADD INDEX (estado_solicitud);
+
+ALTER TABLE prestamos
+ADD COLUMN solicitud_estado_prestamo ENUM ('APROBADO', 'RECHAZADO'),
+ADD CONSTRAINT fk_solicitud_estado FOREIGN KEY (solicitud_estado_prestamo) REFERENCES solicitud_credito(estado_solicitud);
+
+CREATE TABLE pago_prestamo(
+id_pago_prestamo INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+prestamo_id INT NOT NULL,
+monto DECIMAL(12,2) DEFAULT 0.00,
+usuario_registro INT NOT NULL,
+fecha DATE,
+id_estado INT NOT NULL,
+FOREIGN KEY (id_estado) REFERENCES catalogo_estado_prestamo(id_estado_prestamo)
+);
+
+DROP TABLE solicitud_apertura_cuenta;
