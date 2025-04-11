@@ -1,0 +1,53 @@
+DELIMITER $$
+
+CREATE PROCEDURE pagar_prestamo(
+    IN p_prestamo_id INT,
+    IN p_monto_pago DECIMAL(12,2),
+    IN p_usuario_registro INT
+)
+BEGIN
+    DECLARE v_saldo_actual DECIMAL(12,2);
+    DECLARE v_estado_pagado INT;
+
+    -- Verificar si el préstamo existe y obtener el saldo actual
+    SELECT monto INTO v_saldo_actual FROM prestamos WHERE id_prestamo = p_prestamo_id;
+    
+    IF v_saldo_actual IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El préstamo no existe';
+    END IF;
+
+    -- Validar que el monto del pago no supere el saldo actual
+    IF p_monto_pago > v_saldo_actual THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El monto del pago no puede ser mayor al saldo del préstamo';
+    END IF;
+
+    -- Registrar el pago en la tabla pago_prestamo
+    INSERT INTO pago_prestamo (
+        prestamo_id, 
+        monto, 
+        usuario_registro, 
+        fecha, 
+        id_estado
+    ) VALUES (
+        p_prestamo_id, 
+        p_monto_pago, 
+        p_usuario_registro, 
+        CURDATE(), 
+        1 -- Asumiendo 1 = estado ACTIVO, puedes ajustarlo
+    );
+
+    -- Actualizar el monto del préstamo (simulando el saldo)
+    UPDATE prestamos 
+    SET monto = v_saldo_actual - p_monto_pago
+    WHERE id_prestamo = p_prestamo_id;
+
+    -- Si el saldo resultante es <= 0, actualizar el estado a PAGADO
+    IF (v_saldo_actual - p_monto_pago) <= 0 THEN
+        UPDATE prestamos 
+        SET estado = 'PAGADO' 
+        WHERE id_prestamo = p_prestamo_id;
+    END IF;
+
+END$$
+
+DELIMITER ;
