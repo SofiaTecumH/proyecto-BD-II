@@ -2,52 +2,62 @@ DELIMITER $$
 
 CREATE PROCEDURE pagar_prestamo(
     IN p_prestamo_id INT,
+    IN p_cuota_id INT,
     IN p_monto_pago DECIMAL(12,2),
     IN p_usuario_registro INT
 )
 BEGIN
-    DECLARE v_saldo_actual DECIMAL(12,2);
-    DECLARE v_estado_pagado INT;
+    DECLARE v_monto_pendiente DECIMAL(12,2);
+    DECLARE v_nuevo_monto_pendiente DECIMAL(12,2);
+    DECLARE v_nuevo_estado ENUM('PENDIENTE','PAGADO');
 
-    -- Verificar si el préstamo existe y obtener el saldo actual
-    SELECT monto INTO v_saldo_actual FROM prestamos WHERE id_prestamo = p_prestamo_id;
-    
-    IF v_saldo_actual IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El préstamo no existe';
+    -- Obtener el monto pendiente actual de la cuota
+    SELECT monto_pendiente
+    INTO v_monto_pendiente
+    FROM cuotas_prestamos
+    WHERE id_cuota = p_cuota_id AND id_prestamo = p_prestamo_id;
+
+    -- Validar que el monto a pagar no exceda el monto pendiente
+    IF p_monto_pago > v_monto_pendiente THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El monto del pago excede el saldo pendiente de la cuota.';
     END IF;
 
-    -- Validar que el monto del pago no supere el saldo actual
-    IF p_monto_pago > v_saldo_actual THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El monto del pago no puede ser mayor al saldo del préstamo';
+    -- Calcular nuevo monto pendiente
+    SET v_nuevo_monto_pendiente = v_monto_pendiente - p_monto_pago;
+
+    -- Determinar nuevo estado
+    IF v_nuevo_monto_pendiente <= 0 THEN
+        SET v_nuevo_estado = 'PAGADO';
+        SET v_nuevo_monto_pendiente = 0; -- Para evitar negativos
+    ELSE
+        SET v_nuevo_estado = 'PENDIENTE';
     END IF;
 
-    -- Registrar el pago en la tabla pago_prestamo
+    -- Actualizar la cuota con el nuevo monto pendiente y estado
+    UPDATE cuotas_prestamos
+    SET 
+        monto_pendiente = v_nuevo_monto_pendiente,
+        estado = v_nuevo_estado
+    WHERE id_cuota = p_cuota_id;
+
+    -- Registrar el pago en la tabla de pagos
     INSERT INTO pago_prestamo (
         prestamo_id, 
         monto, 
         usuario_registro, 
         fecha, 
-        id_estado
+        id_estado, 
+        cuota_id
     ) VALUES (
         p_prestamo_id, 
         p_monto_pago, 
         p_usuario_registro, 
         CURDATE(), 
-        1 -- Asumiendo 1 = estado ACTIVO, puedes ajustarlo
+        1, -- estado registrado
+        p_cuota_id
     );
-
-    -- Actualizar el monto del préstamo (simulando el saldo)
-    UPDATE prestamos 
-    SET monto = v_saldo_actual - p_monto_pago
-    WHERE id_prestamo = p_prestamo_id;
-
-    -- Si el saldo resultante es <= 0, actualizar el estado a PAGADO
-    IF (v_saldo_actual - p_monto_pago) <= 0 THEN
-        UPDATE prestamos 
-        SET estado = 'PAGADO' 
-        WHERE id_prestamo = p_prestamo_id;
-    END IF;
-
 END$$
 
 DELIMITER ;
+
