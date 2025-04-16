@@ -290,3 +290,11 @@ ADD CONSTRAINT pk_id_usuarios_cuenta_juridica PRIMARY KEY (id_usuarios_cuenta_ju
 
 ALTER TABLE usuarios_cuenta_juridica
 ADD CONSTRAINT fk_id_usuarios_cuenta_juridica FOREIGN KEY (id_cliente_juridico) REFERENCES clientesjuridicos(id_ClienteJuridico) ON DELETE CASCADE;
+
+-- UPDATE 16/04 -- 
+ALTER TABLE operaciones_bancarias
+ADD COLUMN operacion ENUM ('DEPOSITO', 'RETIRO') DEFAULT NULL,
+DROP FOREIGN KEY fk_operaciones_bancarias_bitacora1,
+DROP FOREIGN KEY operaciones_bancarias_ibfk_3,
+DROP COLUMN bitacora_id_bitacora,
+DROP COLUMN tipo_operacion_id;
