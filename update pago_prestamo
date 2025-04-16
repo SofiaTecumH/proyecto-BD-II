@@ -1,0 +1,8 @@
+ALTER TABLE cuotas_prestamos
+  CHANGE COLUMN `id_pago_cuota` `id_cuota` INT NOT NULL AUTO_INCREMENT,
+  ADD COLUMN `monto_pendiente` DECIMAL(12,2) DEFAULT NULL,
+  CHANGE COLUMN `monto_pago` `monto_mensual` DECIMAL(12,2) NULL DEFAULT NULL;
+  
+ALTER TABLE pago_prestamo
+ADD COLUMN cuota_id INT,
+ADD CONSTRAINT fk_cuota_id FOREIGN KEY (cuota_id) REFERENCES cuotas_prestamos(id_cuota) ON DELETE CASCADE;
