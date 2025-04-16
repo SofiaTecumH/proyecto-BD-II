@@ -282,3 +282,11 @@ FOREIGN KEY (id_estado) REFERENCES catalogo_estado_prestamo(id_estado_prestamo)
 );
 
 DROP TABLE solicitud_apertura_cuenta;
+
+-- UDATE 15/04 --
+ALTER TABLE usuarios_cuenta_juridica
+ADD COLUMN id_usuarios_cuenta_juridica INT NOT NULL,
+ADD CONSTRAINT pk_id_usuarios_cuenta_juridica PRIMARY KEY (id_usuarios_cuenta_juridica);
+
+ALTER TABLE usuarios_cuenta_juridica
+ADD CONSTRAINT fk_id_usuarios_cuenta_juridica FOREIGN KEY (id_cliente_juridico) REFERENCES clientesjuridicos(id_ClienteJuridico) ON DELETE CASCADE;
