@@ -1,0 +1,80 @@
+DELIMITER //
+
+CREATE PROCEDURE generar_cuotas (
+    IN p_id_prestamo INT,              -- ID del préstamo
+    IN p_numero_cuotas INT,            -- Número de cuotas solicitadas por el cliente
+    IN p_tasa_interes DECIMAL(5,2)     -- Tasa de interés que se aplicará
+)
+BEGIN
+    DECLARE v_monto_base DECIMAL(12,2);
+    DECLARE v_interes_total DECIMAL(12,2);
+    DECLARE v_total_pagar DECIMAL(12,2);
+    DECLARE v_monto_mensual DECIMAL(12,2);
+    DECLARE v_fecha_inicio DATE;
+    DECLARE v_monto_pendiente DECIMAL(12,2);
+    DECLARE v_fecha_pago DATE;
+
+    -- Obtener monto del préstamo y la fecha de inicio
+    SELECT monto, DATE(fecha)
+    INTO v_monto_base, v_fecha_inicio
+    FROM prestamos
+    WHERE id_prestamo = p_id_prestamo;
+
+    -- Validar que el préstamo exista
+    IF v_monto_base IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El préstamo con el ID especificado no existe.';
+    END IF;
+
+    -- Actualizar la tasa de interés en la tabla de préstamos
+    UPDATE prestamos
+    SET intereses = p_tasa_interes
+    WHERE id_prestamo = p_id_prestamo;
+
+    -- Calcular el total de intereses sobre el monto base
+    SET v_interes_total = v_monto_base * (p_tasa_interes / 100);
+    
+    -- Calcular el monto total a pagar (monto base + intereses)
+    SET v_total_pagar = v_monto_base + v_interes_total;
+
+    -- Calcular el monto mensual de la cuota
+    SET v_monto_mensual = ROUND(v_total_pagar / p_numero_cuotas, 2);
+
+    -- Establecer el monto pendiente inicial (igual al monto total del préstamo)
+    SET v_monto_pendiente = v_monto_base;
+
+    -- Generar la fecha de pago (la primer cuota se paga en el primer mes)
+    SET v_fecha_pago = DATE_ADD(v_fecha_inicio, INTERVAL 1 MONTH);  -- Primer cuota al mes siguiente de la fecha de inicio
+
+    -- Insertar una sola cuota en la tabla `cuotas_prestamos`
+    INSERT INTO cuotas_prestamos (
+        id_prestamo, 
+        fecha_pago, 
+        estado, 
+        no_cuotas, 
+        monto_mensual, 
+        monto_pendiente
+    ) 
+    VALUES (
+        p_id_prestamo,
+        v_fecha_pago,   -- Fecha de pago
+        'PENDIENTE',    -- Estado de la cuota
+        p_numero_cuotas, -- Número total de cuotas
+        v_monto_mensual, -- Monto mensual calculado
+        v_monto_pendiente -- Monto pendiente (igual al monto base en la primera cuota)
+    );
+
+    -- Devolver los resultados calculados
+    SELECT 
+        p_id_prestamo AS id_prestamo,
+        v_monto_base AS monto_base,
+        v_interes_total AS interes_total,
+        v_total_pagar AS total_a_pagar,
+        v_monto_mensual AS monto_mensual,
+        v_monto_pendiente AS monto_pendiente,
+        v_fecha_pago AS fecha_pago;
+
+END;
+//
+
+DELIMITER ;
