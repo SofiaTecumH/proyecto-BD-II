@@ -1,0 +1,72 @@
+DELIMITER //
+CREATE PROCEDURE registrar_operacion (
+  IN p_monto DECIMAL(12,2),
+  IN p_id_cuenta_ahorro VARCHAR(20),
+  IN p_id_cuenta_monetaria VARCHAR(20),
+  IN p_operacion ENUM('DEPOSITO','RETIRO')
+)
+BEGIN
+  DECLARE v_saldo_actual DECIMAL(12,2);
+
+  -- Operación en cuenta de ahorro
+  IF p_id_cuenta_ahorro IS NOT NULL THEN
+    -- Obtener saldo actual
+    SELECT saldo INTO v_saldo_actual
+    FROM cuentas_ahorro
+    WHERE id_cuenta_ahorro = p_id_cuenta_ahorro;
+
+    IF p_operacion = 'DEPOSITO' THEN
+      -- Actualizar saldo
+      UPDATE cuentas_ahorro
+      SET saldo = saldo + p_monto
+      WHERE id_cuenta_ahorro = p_id_cuenta_ahorro;
+
+    ELSEIF p_operacion = 'RETIRO' THEN
+      IF v_saldo_actual >= p_monto THEN
+        UPDATE cuentas_ahorro
+        SET saldo = saldo - p_monto
+        WHERE id_cuenta_ahorro = p_id_cuenta_ahorro;
+      ELSE
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Saldo insuficiente en cuenta de ahorro';
+      END IF;
+    END IF;
+
+    -- Registrar operación
+    INSERT INTO operaciones_bancarias (monto, id_cuenta_ahorro, operacion)
+    VALUES (p_monto, p_id_cuenta_ahorro, p_operacion);
+
+  -- Operación en cuenta monetaria
+  ELSEIF p_id_cuenta_monetaria IS NOT NULL THEN
+    -- Obtener saldo actual
+    SELECT saldo INTO v_saldo_actual
+    FROM cuentas_monetarias
+    WHERE id_cuenta_monetaria = p_id_cuenta_monetaria;
+
+    IF p_operacion = 'DEPOSITO' THEN
+      UPDATE cuentas_monetarias
+      SET saldo = saldo + p_monto
+      WHERE id_cuenta_monetaria = p_id_cuenta_monetaria;
+
+    ELSEIF p_operacion = 'RETIRO' THEN
+      IF v_saldo_actual >= p_monto THEN
+        UPDATE cuentas_monetarias
+        SET saldo = saldo - p_monto
+        WHERE id_cuenta_monetaria = p_id_cuenta_monetaria;
+      ELSE
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Saldo insuficiente en cuenta monetaria';
+      END IF;
+    END IF;
+
+    -- Registrar operación
+    INSERT INTO operaciones_bancarias (monto, id_cuenta_monetaria, operacion)
+    VALUES (p_monto, p_id_cuenta_monetaria, p_operacion);
+
+  ELSE
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Debe especificarse una cuenta válida (ahorro o monetaria)';
+  END IF;
+END;
+//
+DELIMITER ;
