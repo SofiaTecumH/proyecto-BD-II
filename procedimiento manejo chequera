@@ -1,0 +1,98 @@
+DELIMITER $$
+
+CREATE PROCEDURE manejo_tarjeta_chequera(
+  IN p_monto DECIMAL(12,2),
+  IN p_id_tarjeta VARCHAR(20),
+  IN p_id_chequera INT
+)
+BEGIN
+  DECLARE v_saldo_actual DECIMAL(12,2);
+  DECLARE v_id_cuenta_monetaria VARCHAR(20);
+  DECLARE v_id_cliente INT;
+  DECLARE v_cliente_nombre VARCHAR(200);
+  DECLARE v_numero_cheque VARCHAR(50);
+
+  -- Obtener datos desde tarjeta
+  IF p_id_tarjeta IS NOT NULL THEN
+    SELECT t.id_cuenta_monetaria, t.id_cliente
+    INTO v_id_cuenta_monetaria, v_id_cliente
+    FROM tarjeta t
+    WHERE t.id_tarjeta = p_id_tarjeta;
+
+  -- Obtener datos desde chequera
+  ELSEIF p_id_chequera IS NOT NULL THEN
+    SELECT ch.id_cuenta_monetaria, ch.id_cliente, ch.cliente
+    INTO v_id_cuenta_monetaria, v_id_cliente, v_cliente_nombre
+    FROM chequera ch
+    WHERE ch.id = p_id_chequera;
+
+  ELSE
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Debe proporcionar una tarjeta o chequera válida';
+  END IF;
+
+  -- Verificar saldo
+  SELECT saldo INTO v_saldo_actual
+  FROM cuentas_monetarias
+  WHERE id_cuenta_monetaria = v_id_cuenta_monetaria;
+
+  IF v_saldo_actual < p_monto THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Saldo insuficiente en cuenta monetaria';
+  END IF;
+
+  -- Descontar saldo
+  UPDATE cuentas_monetarias
+  SET saldo = saldo - p_monto
+  WHERE id_cuenta_monetaria = v_id_cuenta_monetaria;
+
+  -- Generar número de cheque aleatorio (solo números)
+  SET v_numero_cheque = CONCAT(FLOOR(RAND() * 1000000));
+
+  -- Registrar en manejo_chequera
+  IF p_id_chequera IS NOT NULL THEN
+    INSERT INTO manejo_chequera (
+      cliente,
+      numero_cuenta_monetaria,
+      fecha,
+      numero_cheque,
+      descripcion,
+      debito
+    ) VALUES (
+      v_cliente_nombre,
+      v_id_cuenta_monetaria,
+      NOW(),
+      v_numero_cheque,
+      'Retiro mediante chequera',
+      p_monto
+    );
+  END IF;
+
+  -- Registrar en manejo_tarjeta
+  IF p_id_tarjeta IS NOT NULL THEN
+    -- Si ya existe un registro, lo actualizamos
+    IF EXISTS (SELECT 1 FROM manejo_tarjeta WHERE id_tarjeta = p_id_tarjeta) THEN
+      UPDATE manejo_tarjeta
+      SET estado = 'RETIRO',
+          monto = p_monto,
+          clientes_id_clientes = v_id_cliente
+      WHERE id_tarjeta = p_id_tarjeta;
+    ELSE
+      -- Si no existe, lo insertamos
+      INSERT INTO manejo_tarjeta (
+        id_tarjeta,
+        estado,
+        monto,
+        clientes_id_clientes
+      ) VALUES (
+        p_id_tarjeta,
+        'RETIRO',
+        p_monto,
+        v_id_cliente
+      );
+    END IF;
+  END IF;
+
+END$$
+
+DELIMITER ;
