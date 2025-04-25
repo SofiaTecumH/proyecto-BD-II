@@ -1,0 +1,10 @@
+ALTER TABLE cooperativa_db.clientesjuridicos 
+ADD COLUMN estado VARCHAR(45) NULL AFTER numero_casa;
+
+ALTER TABLE cooperativa_db.clientes_individuales 
+ADD COLUMN estado VARCHAR(45) NULL AFTER ` correo_electronico`;
+
+ALTER TABLE cooperativa_db.clientes 
+CHANGE COLUMN id_cliente_individual id_cliente_individual INT NULL ,
+CHANGE COLUMN id_cliente_juridico id_cliente_juridico INT NULL ,
+CHANGE COLUMN id_socio id_socio INT NULL ;
