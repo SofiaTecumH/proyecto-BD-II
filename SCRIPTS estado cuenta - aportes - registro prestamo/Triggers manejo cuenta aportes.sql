@@ -1,7 +1,3 @@
-SHOW CREATE TRIGGER tgBefore_AsignarBloqueoAportes;
-SHOW CREATE TRIGGER ActualizarSaldoAportes;
-SHOW CREATE TRIGGER BloquearRetirosAntesDe6Meses;
-
  -- --------------------------------------------------------------------------------------------------
  -- TRIGGER QUE DEFINE LA FECHA DE BLOQUEO DE LA CUENTA APORTES DESDE SU CREACION
   -- --------------------------------------------------------------------------------------------------
