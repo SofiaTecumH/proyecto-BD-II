@@ -1,0 +1,42 @@
+ALTER TABLE tarjeta
+MODIFY COLUMN fecha_vencimiento DATE;
+
+-- Paso 1: Cambiar el tipo de columna
+ALTER TABLE tarjeta
+MODIFY COLUMN no_cuenta_monetaria VARCHAR(20) NOT NULL;
+ALTER TABLE tarjeta
+ADD CONSTRAINT fk_tarjeta_cuenta_monetaria
+FOREIGN KEY (no_cuenta_monetaria)
+REFERENCES cuentas_monetarias(id_cuenta_monetaria);
+
+-- Paso 1: Eliminar la foreign key existente
+ALTER TABLE chequera
+DROP FOREIGN KEY fk_chequera_manejo_chequera1;
+
+-- Paso 2: Eliminar el índice asociado a la foreign key
+ALTER TABLE chequera
+DROP INDEX fk_chequera_manejo_chequera1_idx;
+
+-- Paso 3: Eliminar la columna manejo_chequera_id_chequera
+ALTER TABLE chequera
+DROP COLUMN manejo_chequera_id_chequera;
+
+-- Paso 4: Agregar la nueva columna id_cuenta_monetaria
+ALTER TABLE chequera
+ADD COLUMN id_cuenta_monetaria VARCHAR(20) NOT NULL;
+
+-- Paso 5: Crear la nueva foreign key hacia cuenta_monetaria
+ALTER TABLE chequera
+ADD CONSTRAINT fk_chequera_cuenta_monetaria
+FOREIGN KEY (id_cuenta_monetaria)
+REFERENCES cuentas_monetarias(id_cuenta_monetaria);
+
+ALTER TABLE chequera
+DROP COLUMN monto;
+
+ALTER TABLE `cooperativa_db`.`manejo_chequera` 
+CHANGE COLUMN ` numero_cuenta_monetaria` ` numero_cuenta_monetaria` VARCHAR(20) NOT NULL ;
+
+
+ALTER TABLE `cooperativa_db`.`manejo_chequera` 
+CHANGE COLUMN `numero_cheque` `numero_cheque` VARCHAR(50) NOT NULL ;
