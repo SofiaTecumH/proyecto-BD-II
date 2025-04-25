@@ -1,0 +1,57 @@
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_manejo_chequera
+AFTER INSERT ON manejo_chequera
+FOR EACH ROW
+BEGIN
+  INSERT INTO bitacora (
+    accion,
+    tabla_afectada,
+    tipo_accion,
+    fecha,
+    detalles
+  ) VALUES (
+    CONCAT('Se insertó un cheque con número ', NEW.numero_cheque),
+    'manejo_chequera',
+    'INSERT',
+    NOW(),
+    CONCAT(
+      'Cliente: ', NEW.cliente, 
+      ', Cuenta: ', NEW.numero_cuenta_monetaria,
+      ', Fecha: ', NEW.fecha,
+      ', Monto Débito: ', NEW.debito,
+      ', Descripción: ', IFNULL(NEW.descripcion, 'Ninguna')
+    )
+  );
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_manejo_tarjeta
+AFTER INSERT ON manejo_tarjeta
+FOR EACH ROW
+BEGIN
+  INSERT INTO bitacora (
+    accion,
+    tabla_afectada,
+    tipo_accion,
+    fecha,
+    detalles
+  ) VALUES (
+    CONCAT('Se insertó un manejo de tarjeta con ID ', NEW.id_tarjeta),
+    'manejo_tarjeta',
+    'INSERT',
+    NOW(),
+    CONCAT(
+      'ID Tarjeta: ', NEW.id_tarjeta,
+      ', Estado: ', NEW.estado,
+      ', Monto: ', IFNULL(NEW.monto, '0.00'),
+      ', ID Cliente: ', NEW.clientes_id_clientes
+    )
+  );
+END$$
+
+DELIMITER ;
