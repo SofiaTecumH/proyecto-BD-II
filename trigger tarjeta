@@ -1,0 +1,15 @@
+DELIMITER //
+Triggers 
+CREATE TRIGGER `tarjeta_BEFORE_INSERT` BEFORE INSERT ON `tarjeta` FOR EACH ROW BEGIN
+	SET NEW.id_tarjeta = CONCAT(
+       9, LPAD(FLOOR(RAND() * 10000), 3, '0'), ' ', 
+        LPAD(FLOOR(RAND() * 100000), 4, '0'), ' ', 
+        LPAD(FLOOR(RAND() * 100000), 4, '0'), ' ', 
+        LPAD(FLOOR(RAND() * 10000), 4, '0')
+    );
+	SET NEW.cvv = CONCAT(
+       LPAD(FLOOR(RAND() * 10000), 3, '0')
+    );
+    SET NEW.fecha_vencimiento= DATE_ADD(CURDATE(), INTERVAL 3 YEAR);
+END;
+DELIMITER ;
