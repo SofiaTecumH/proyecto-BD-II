@@ -1,23 +1,5 @@
--- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
---
--- Host: localhost    Database: cooperativa_db
--- ------------------------------------------------------
--- Server version	8.0.41
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
 -- Table structure for table `auditoria`
---
 
 DROP TABLE IF EXISTS `auditoria`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -36,9 +18,7 @@ CREATE TABLE `auditoria` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `bienes_inmuebles`
---
 
 DROP TABLE IF EXISTS `bienes_inmuebles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -56,9 +36,7 @@ CREATE TABLE `bienes_inmuebles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `bitacora`
---
 
 DROP TABLE IF EXISTS `bitacora`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -74,9 +52,7 @@ CREATE TABLE `bitacora` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogo_clientes`
---
 
 DROP TABLE IF EXISTS `catalogo_clientes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -87,9 +63,7 @@ CREATE TABLE `catalogo_clientes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogo_estado`
---
 
 DROP TABLE IF EXISTS `catalogo_estado`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -101,9 +75,7 @@ CREATE TABLE `catalogo_estado` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogo_estado_prestamo`
---
 
 DROP TABLE IF EXISTS `catalogo_estado_prestamo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -115,9 +87,7 @@ CREATE TABLE `catalogo_estado_prestamo` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogo_tipo_operacion`
---
 
 DROP TABLE IF EXISTS `catalogo_tipo_operacion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -129,9 +99,7 @@ CREATE TABLE `catalogo_tipo_operacion` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogo_tipo_usuario`
---
 
 DROP TABLE IF EXISTS `catalogo_tipo_usuario`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -143,9 +111,7 @@ CREATE TABLE `catalogo_tipo_usuario` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `catalogoconceptos`
---
 
 DROP TABLE IF EXISTS `catalogoconceptos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -161,9 +127,7 @@ CREATE TABLE `catalogoconceptos` (
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `chequera`
---
 
 DROP TABLE IF EXISTS `chequera`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -179,9 +143,7 @@ CREATE TABLE `chequera` (
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
 -- Table structure for table `clientes`
---
 
 DROP TABLE IF EXISTS `clientes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
